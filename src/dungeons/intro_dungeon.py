@@ -21,8 +21,7 @@ class IntroDungeon:
             print("2) Grab item")
             print("3) Combine items")
             print("4) Use item")
-            print("5) Go to another area")
-            print("6) Escape")
+            print("5) Escape")
             action = input("> ")
 
             if action == '1':
@@ -58,6 +57,10 @@ class IntroDungeon:
                         game_key.player.remove_from_backpack(i2)
                         game_key.player.add_to_backpack(result)
                         slow_print("You created: " + result)
+
+                        if result == "sprout":
+                            slow_print("A magical wind blows... you feel drawn toward a nearby tree hollow.")
+                            return "tree hollow"
                     else:
                         slow_print("You're missing something.")
                 else:
@@ -73,14 +76,6 @@ class IntroDungeon:
                     slow_print("You don't have that.")
 
             elif action == '5':
-                slow_print("Where do you want to go? Available: tree hollow")
-                dest = input().lower()
-                if dest == "tree hollow":
-                    return "tree hollow"
-                else:
-                    slow_print("That place doesn't exist.")
-
-            elif action == '6':
                 if "sprout" in game_key.player.backpack:
                     slow_print("You plant the sprout and escape through a growing vine! You win!")
                     game_key.game_over = True

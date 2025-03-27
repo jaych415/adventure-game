@@ -1,83 +1,89 @@
+from .utils import *
+
 class IntroDungeon:
-    def __init__(self, name, description, items=None):
-        self.name = name
-        self.description = description
-        self.items = items or []
+    def __init__(self):
+        self.room_items = ["(s)eeds", "(d)irt", "(w)ater"]
+        self.combinator_dict = {
+            frozenset(["(d)irt", "(w)ater"]): "mud",
+            frozenset(["(d)irt", "(s)eeds"]): "sprout",
+            frozenset(["(s)eeds", "(w)ater"]): "watery seeds"
+        }
 
-    def enter(self, game):
-        print(f"\n--- {self.name.upper()} ---")
-        print(self.description)
-        if self.items:
-            print("\nItems here:")
-            for item in self.items:
-                print(f" - {item}")
-        else:
-            print("\nThere are no items here.")
+    def enter(self, game_key):
+        slow_print("You awaken on a riverbank...")
+        pause(2)
+        slow_print("You have no idea how you got here.")
+        pause(2)
 
-        self.menu_loop(game)
-
-    def menu_loop(self, game):
         while True:
-            print("\nWhat would you like to do?")
-            print("1. Take an item")
-            print("2. Combine items")
-            print("3. Check backpack")
-            print("4. Move to another location")
-            print("5. Try to escape")
-            print("6. Quit")
+            print("*** MENU ***")
+            print("1) Search area")
+            print("2) Grab item")
+            print("3) Combine items")
+            print("4) Use item")
+            print("5) Go to another area")
+            print("6) Escape")
+            action = input("> ")
 
-            choice = input("> ").strip()
+            if action == '1':
+                slow_print("You see some (s)eeds, a pile of (d)irt, and a pail of (w)ater.")
 
-            if choice == "1":
-                if not self.items:
-                    print("There are no items to take.")
+            elif action == '2':
+                slow_print("What would you like to grab? (s/w/d)")
+                item = input().lower()
+                name_map = {"s": "(s)eeds", "w": "(w)ater", "d": "(d)irt"}
+                name = name_map.get(item)
+                if name and name in self.room_items:
+                    self.room_items.remove(name)
+                    game_key.player.add_to_backpack(name)
                 else:
-                    print("\nWhich item would you like to take?")
-                    for i, item in enumerate(self.items, 1):
-                        print(f"{i}. {item}")
-                    item_choice = input("> ").strip()
-                    if item_choice.isdigit():
-                        index = int(item_choice) - 1
-                        if 0 <= index < len(self.items):
-                            item = self.items.pop(index)
-                            game.player.add_to_backpack(item)
-                        else:
-                            print("Invalid selection.")
+                    slow_print("That item isn't here.")
+
+            elif action == '3':
+                game_key.player.print_backpack()
+                slow_print("Combine what first? (s/w/d or full name)")
+                name_map = {"s": "(s)eeds", "w": "(w)ater", "d": "(d)irt"}
+                i1_key = input().lower()
+                slow_print("Combine with? (s/w/d or full name)")
+                i2_key = input().lower()
+
+                i1 = name_map.get(i1_key, i1_key)
+                i2 = name_map.get(i2_key, i2_key)
+
+                key = frozenset([i1, i2])
+                if key in self.combinator_dict:
+                    result = self.combinator_dict[key]
+                    if i1 in game_key.player.backpack and i2 in game_key.player.backpack:
+                        game_key.player.remove_from_backpack(i1)
+                        game_key.player.remove_from_backpack(i2)
+                        game_key.player.add_to_backpack(result)
+                        slow_print("You created: " + result)
                     else:
-                        print("Please enter a number.")
-
-            elif choice == "2":
-                print("Enter the names of two items to combine:")
-                item1 = input("Item 1: ").strip().lower()
-                item2 = input("Item 2: ").strip().lower()
-                game.player.combine_items(item1, item2)
-
-            elif choice == "3":
-                game.player.show_backpack()
-
-            elif choice == "4":
-                print("\nWhere would you like to go?")
-                for key in game.screens:
-                    print(f"- {key}")
-                dest = input("> ").strip().lower()
-                if dest in game.screens:
-                    game.change_screen(dest)
-                    return
+                        slow_print("You're missing something.")
                 else:
-                    print("You can't go there.")
+                    slow_print("That didn't work.")
 
-            elif choice == "5":
-                if self.name == "Tree Hollow" and "sprout" in game.player.backpack and "nest" in game.player.backpack:
-                    print("You plant the sprout in the nest... A magical tree lifts you to safety. You win! 🌳✨")
-                    game.game_over = True
-                    return
+            elif action == '4':
+                slow_print("Which item do you want to use?")
+                game_key.player.print_backpack()
+                item = input().lower()
+                if item in game_key.player.backpack:
+                    slow_print("You use the " + item + ". Nothing major happens.")
                 else:
-                    print("You can't escape yet. Maybe you're missing something...")
+                    slow_print("You don't have that.")
 
-            elif choice == "6":
-                print("Thanks for playing!")
-                game.game_over = True
-                return
+            elif action == '5':
+                slow_print("Where do you want to go? Available: tree hollow")
+                dest = input().lower()
+                if dest == "tree hollow":
+                    return "tree hollow"
+                else:
+                    slow_print("That place doesn't exist.")
 
-            else:
-                print("Please enter a number between 1 and 6.")
+            elif action == '6':
+                if "sprout" in game_key.player.backpack:
+                    slow_print("You plant the sprout and escape through a growing vine! You win!")
+                    game_key.game_over = True
+                    return None
+                else:
+                    slow_print("You can't escape yet.")

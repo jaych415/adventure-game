@@ -16,17 +16,18 @@ class Player:
             print(f"Removed '{item}' from backpack.")
 
     def show_backpack(self):
-        print("\nBackpack:")
+        print("Backpack:")
         if not self.backpack:
             print(" - (empty)")
-        for item in self.backpack:
-            print(f" - {item}")
+        else:
+            for item in self.backpack:
+                print(" -", item)
 
     def combine_items(self, item1, item2):
         combinations = {
-            frozenset(["seed", "water"]): "sprout",
-            frozenset(["twig", "leaf"]): "nest",
-            frozenset(["moss", "bark"]): "camouflage cloak"
+            frozenset(["(s)eeds", "(w)ater"]): "watery seeds",
+            frozenset(["(d)irt", "(w)ater"]): "mud",
+            frozenset(["(d)irt", "(s)eeds"]): "sprout"
         }
         key = frozenset([item1, item2])
         if key in combinations:
@@ -40,3 +41,11 @@ class Player:
                 print("You don't have both items.")
         else:
             print("Nothing happens.")
+
+    def print_backpack(self):
+        if not self.backpack:
+            print("Your backpack is empty.")
+        else:
+            print("Your backpack contains:")
+            for item in self.backpack:
+                print("-", item)

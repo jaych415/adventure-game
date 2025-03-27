@@ -1,27 +1,26 @@
+### src/game_key_maker.py
 from .player import Player
-from .screens import Scene
 from .dungeons.intro_dungeon import IntroDungeon
+from .dungeons.tree_hollow import TreeHollow
 
 class GameKeyMaker:
-    def __init__(self, intro_class):
+    def __init__(self):
         self.player = Player()
         self.game_over = False
-
-        self.screens = {
-            "forest clearing": intro_class("Forest Clearing", "You're in a clearing surrounded by tall trees.", items=["seed"]),
-            "shaded grove": Scene("Shaded Grove", "Sunlight filters through. Nature feels alive.", items=["water", "twig"]),
-            "tree hollow": Scene("Tree Hollow", "You discover a hollow tree — it could be a way out.", items=["leaf", "bark", "moss"]),
+        self.scenes = {
+            "intro": IntroDungeon(),
+            "tree hollow": TreeHollow()
         }
-
-        self.current_screen = self.screens["forest clearing"]
+        self.current_scene = "intro"
 
     def start(self):
-        print("\n🌳 Welcome to the Nature Escape Game 🌱")
+        print("🌳 Welcome to the Nature Escape Game 🌱")
         while not self.game_over:
-            self.current_screen.enter(self)
+            scene = self.scenes[self.current_scene]
+            self.current_scene = scene.enter(self) or self.current_scene
 
-    def change_screen(self, name):
-        if name in self.screens:
-            self.current_screen = self.screens[name]
+    def change_scene(self, name):
+        if name in self.scenes:
+            self.current_scene = name
         else:
             print("That place doesn't exist.")

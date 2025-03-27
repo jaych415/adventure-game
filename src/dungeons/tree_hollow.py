@@ -2,7 +2,8 @@ from .utils import *
 
 class TreeHollow:
     def __init__(self):
-        self.room_items = ["shovel"]
+        self.room_items = []
+        self.shovel_found = False
         self.combinator_dict = {
             frozenset(["shovel", "sprout"]): "planted tree"
         }
@@ -11,28 +12,43 @@ class TreeHollow:
         slow_print("You arrive at a quiet tree hollow. It's peaceful here.")
         pause(1)
 
-        if "shovel" not in game_key.player.backpack and "shovel" in self.room_items:
-            slow_print("You notice a shovel leaning against the hollow trunk.")
-            slow_print("Do you want to take it? (yes/no)")
-            take = input().lower()
-            if take == "yes":
-                game_key.player.add_to_backpack("shovel")
-                self.room_items.remove("shovel")
-            else:
-                slow_print("You leave the shovel behind.")
-
         while True:
             print("*** TREE HOLLOW MENU ***")
-            print("1) Check backpack")
-            print("2) Combine items")
-            print("3) Use item")
-            print("4) Escape")
+            print("1) Search area")
+            print("2) Grab item")
+            print("3) Check backpack")
+            print("4) Combine items")
+            print("5) Use item")
+            print("6) Escape")
             choice = input("> ")
 
             if choice == "1":
-                game_key.player.print_backpack()
+                if not self.shovel_found:
+                    slow_print("You dig around some roots and discover a rusty shovel.")
+                    self.room_items.append("shovel")
+                    self.shovel_found = True
+                else:
+                    slow_print("You've already searched the area. Nothing else is here.")
 
             elif choice == "2":
+                if not self.room_items:
+                    slow_print("There are no items to grab.")
+                else:
+                    slow_print("Items you can grab:")
+                    for item in self.room_items:
+                        slow_print(f"- {item}")
+                    slow_print("What would you like to grab?")
+                    item = input().lower()
+                    if item in self.room_items:
+                        self.room_items.remove(item)
+                        game_key.player.add_to_backpack(item)
+                    else:
+                        slow_print("That item isn't here.")
+
+            elif choice == "3":
+                game_key.player.print_backpack()
+
+            elif choice == "4":
                 game_key.player.print_backpack()
                 slow_print("Combine what first?")
                 i1 = input().lower()
@@ -51,7 +67,7 @@ class TreeHollow:
                 else:
                     slow_print("Those don't combine into anything useful.")
 
-            elif choice == "3":
+            elif choice == "5":
                 slow_print("Which item do you want to use?")
                 game_key.player.print_backpack()
                 item = input().lower()
@@ -60,7 +76,7 @@ class TreeHollow:
                 else:
                     slow_print("You don't have that.")
 
-            elif choice == "4":
+            elif choice == "6":
                 if "planted tree" in game_key.player.backpack:
                     slow_print("The planted tree grows rapidly into a towering beanstalk. You climb to safety. You win!")
                     game_key.game_over = True

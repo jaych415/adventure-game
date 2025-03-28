@@ -1,14 +1,14 @@
 import os
 import sys
 
-# Append the src directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
+# Add src directory to import path
+SRC_PATH = os.path.abspath(os.path.dirname(__file__))
+if SRC_PATH not in sys.path:
+    sys.path.append(SRC_PATH)
 
-# Import necessary modules
-from src.player import Player
-from src.dungeons.intro_dungeon import IntroDungeon
-from src.dungeons.tree_hollow import TreeHollow
-
+from player import Player
+from dungeons.intro_dungeon import IntroDungeon
+from dungeons.tree_hollow import TreeHollow
 
 class GameKeyMaker:
     def __init__(self, intro_dungeon, player):
@@ -24,9 +24,7 @@ class GameKeyMaker:
     def turn(self):
         print("🌳 Welcome to the Nature Escape Game 🌱")
         while not self.game_over and self.current_screen:
-            current_dungeon = self.dungeon_dict[self.current_screen]
-            next_screen = current_dungeon.enter(self)
-
+            next_screen = self.dungeon_dict[self.current_screen].enter(self)
             if next_screen in self.dungeon_dict:
                 self.current_screen = next_screen
             elif next_screen is None:

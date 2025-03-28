@@ -67,7 +67,7 @@ class IntroDungeon:
                     slow_print("That didn't work.")
 
             elif action == '4':
-                slow_print("Which item do you want to use?")
+                slow_print("What would you like to use?")
                 game_key.player.print_backpack()
                 item = input().lower()
                 if item in game_key.player.backpack:

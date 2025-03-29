@@ -21,7 +21,6 @@ class IntroDungeon:
             print("2) Grab item")
             print("3) Combine items")
             print("4) Use item")
-            print("5) Escape")
             action = input("> ")
 
             if action == '1':
@@ -74,11 +73,3 @@ class IntroDungeon:
                     slow_print("You use the " + item + ". Nothing major happens.")
                 else:
                     slow_print("You don't have that.")
-
-            elif action == '5':
-                if "sprout" in game_key.player.backpack:
-                    slow_print("You plant the sprout and escape through a growing vine! You win!")
-                    game_key.game_over = True
-                    return None
-                else:
-                    slow_print("You can't escape yet.")
